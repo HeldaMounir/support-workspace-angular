@@ -1,21 +1,100 @@
 .app-shell {
-  display: flex;
-  min-height: 100vh;
   width: 100%;
-  overflow-x: hidden;
+  height: 100vh;
+  min-height: 100vh;
+
+  display: flex;
+
+  background: #f7f8fc;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
 }
 
 .main-area {
-  flex: 1;
+  flex: 1 1 auto;
+
+  width: calc(100% - 264px);
+  min-width: 0;
+
+  height: 100vh;
+  min-height: 0;
+
   display: flex;
   flex-direction: column;
-  min-width: 0; // مهم جدًا: يمنع flex item من إنه يكبر عن حاويته
-  min-height: 100vh;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+
+  background: #f7f8fc;
 }
 
+/*
+  The page content is the ONLY vertical scroll container.
+  This prevents:
+  - double scrollbar
+  - blank space below sidebar
+  - topbar/sidebar overlap
+*/
+
 .page-content {
-  flex: 1;
-  padding: 24px 32px;
+  flex: 1 1 auto;
+
+  min-height: 0;
+  min-width: 0;
+
+  width: 100%;
+
   overflow-y: auto;
+  overflow-x: hidden;
+
   box-sizing: border-box;
+
+  scrollbar-width: thin;
+  scrollbar-color: #dfe1e8 transparent;
+}
+
+.page-content::-webkit-scrollbar {
+  width: 7px;
+}
+
+.page-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.page-content::-webkit-scrollbar-thumb {
+  background: #dfe1e8;
+  border-radius: 999px;
+}
+
+.page-content::-webkit-scrollbar-thumb:hover {
+  background: #c9ccd5;
+}
+
+/* =========================
+   GLOBAL BOX SIZING
+========================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .main-area {
+    width: calc(100% - 80px);
+  }
+}
+
+@media (max-width: 600px) {
+  .main-area {
+    width: calc(100% - 80px);
+  }
 }

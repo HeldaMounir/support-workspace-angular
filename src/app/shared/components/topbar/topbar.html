@@ -5,7 +5,10 @@
 
     <div class="page-info">
       <span class="page-label">Workspace</span>
-      <h1>{{ pageTitle }}</h1>
+
+      <h1>
+        {{ pageTitle }}
+      </h1>
     </div>
 
   </div>
@@ -15,29 +18,34 @@
   <div class="navbar-right">
 
     <!-- Search -->
-    <button class="icon-btn search-btn">
-      <span>⌕</span>
+    <button
+      type="button"
+      class="icon-btn search-btn"
+      aria-label="Search"
+    >
+      <lucide-icon
+        [img]="Search"
+        [size]="18"
+        [strokeWidth]="1.8"
+      ></lucide-icon>
     </button>
 
 
     <!-- Notifications -->
-    <button class="icon-btn notification-btn">
-      <span>♢</span>
-      <span class="notification-dot"></span>
-    </button>
-
-
-    <!-- THEME TOGGLE -->
     <button
-      class="theme-btn"
-      (click)="toggleTheme()"
-      [attr.aria-label]="darkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+      type="button"
+      class="icon-btn notification-btn"
+      aria-label="Notifications"
     >
-      @if (darkMode) {
-        <span class="theme-icon">☀</span>
-      } @else {
-        <span class="theme-icon">☾</span>
-      }
+
+      <lucide-icon
+        [img]="Bell"
+        [size]="18"
+        [strokeWidth]="1.8"
+      ></lucide-icon>
+
+      <span class="notification-dot"></span>
+
     </button>
 
 
@@ -53,11 +61,23 @@
       </div>
 
       <div class="user-info">
-        <span class="user-name">Helda</span>
-        <span class="user-role">Support Agent</span>
+
+        <span class="user-name">
+          Helda
+        </span>
+
+        <span class="user-role">
+          Support Agent
+        </span>
+
       </div>
 
-      <span class="chevron">⌄</span>
+      <lucide-icon
+        class="chevron"
+        [img]="ChevronDown"
+        [size]="16"
+        [strokeWidth]="1.8"
+      ></lucide-icon>
 
     </div>
 

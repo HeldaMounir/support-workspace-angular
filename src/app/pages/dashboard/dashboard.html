@@ -243,6 +243,9 @@
                     [class.status-closed]="
                       request.status === 'closed'
                     "
+                    [class.status-waiting]="
+  request.status === 'waiting-customer'
+"
                   >
                     {{ getStatusLabel(request.status) }}
                   </span>

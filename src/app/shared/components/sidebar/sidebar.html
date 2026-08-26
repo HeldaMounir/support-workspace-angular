@@ -1,23 +1,68 @@
-<aside class="sidebar" [class.collapsed]="collapsed">
+<aside
+  class="sidebar"
+  [class.collapsed]="collapsed"
+>
 
   <!-- Logo -->
   <div class="sidebar-header">
+
     <div class="logo">
+
       <div class="logo-icon">
         <span>CS</span>
       </div>
 
       @if (!collapsed) {
+
         <div class="logo-text">
-          <span class="logo-title">Support</span>
-          <span class="logo-subtitle">Workspace</span>
+
+          <span class="logo-title">
+            Support
+          </span>
+
+          <span class="logo-subtitle">
+            Workspace
+          </span>
+
         </div>
+
       }
+
     </div>
 
-    <button class="collapse-btn" (click)="toggleSidebar()">
-      <span>{{ collapsed ? '→' : '←' }}</span>
+
+    <!-- Collapse -->
+    <button
+      type="button"
+      class="collapse-btn"
+      (click)="toggleSidebar()"
+      [attr.aria-label]="
+        collapsed
+          ? 'Expand sidebar'
+          : 'Collapse sidebar'
+      "
+    >
+
+      @if (collapsed) {
+
+        <lucide-icon
+          [img]="ChevronRight"
+          [size]="17"
+          [strokeWidth]="2"
+        ></lucide-icon>
+
+      } @else {
+
+        <lucide-icon
+          [img]="ChevronLeft"
+          [size]="17"
+          [strokeWidth]="2"
+        ></lucide-icon>
+
+      }
+
     </button>
+
   </div>
 
 
@@ -25,82 +70,81 @@
   <nav class="sidebar-nav">
 
     <div class="nav-section">
+
       @if (!collapsed) {
-        <p class="section-title">MAIN</p>
+
+        <p class="section-title">
+          MAIN
+        </p>
+
       }
 
+
+      <!-- Dashboard -->
       <a
         routerLink="/dashboard"
         routerLinkActive="active"
         class="nav-item"
-        [title]="collapsed ? 'Dashboard' : ''"
+        [title]="
+          collapsed
+            ? 'Dashboard'
+            : ''
+        "
       >
-        <span class="nav-icon">⌂</span>
+
+        <lucide-icon
+          class="nav-icon"
+          [img]="LayoutDashboard"
+          [size]="18"
+          [strokeWidth]="2"
+        ></lucide-icon>
+
 
         @if (!collapsed) {
-          <span>Dashboard</span>
+
+          <span>
+            Dashboard
+          </span>
+
         }
+
       </a>
 
+
+      <!-- Requests -->
       <a
         routerLink="/requests"
         routerLinkActive="active"
         class="nav-item"
-        [title]="collapsed ? 'Requests' : ''"
+        [title]="
+          collapsed
+            ? 'Requests'
+            : ''
+        "
       >
-        <span class="nav-icon">▣</span>
+
+        <lucide-icon
+          class="nav-icon"
+          [img]="ClipboardList"
+          [size]="18"
+          [strokeWidth]="2"
+        ></lucide-icon>
+
 
         @if (!collapsed) {
-          <span>Requests</span>
-          <span class="nav-badge">12</span>
+
+          <span>
+            Requests
+          </span>
+
+          <span class="nav-badge">
+            12
+          </span>
+
         }
+
       </a>
 
-      <a
-        routerLink="/create-request"
-        routerLinkActive="active"
-        class="nav-item"
-        [title]="collapsed ? 'Create Request' : ''"
-      >
-        <span class="nav-icon">＋</span>
-
-        @if (!collapsed) {
-          <span>Create Request</span>
-        }
-      </a>
-    </div>
-
-
-    <div class="nav-section">
-      @if (!collapsed) {
-        <p class="section-title">MANAGEMENT</p>
-      }
-
-      <a
-        routerLink="/users"
-        routerLinkActive="active"
-        class="nav-item"
-        [title]="collapsed ? 'Users' : ''"
-      >
-        <span class="nav-icon">♙</span>
-
-        @if (!collapsed) {
-          <span>Users</span>
-        }
-      </a>
-
-      <a
-        routerLink="/reports"
-        routerLinkActive="active"
-        class="nav-item"
-        [title]="collapsed ? 'Reports' : ''"
-      >
-        <span class="nav-icon">▥</span>
-
-        @if (!collapsed) {
-          <span>Reports</span>
-        }
-      </a>
     </div>
 
   </nav>
@@ -109,24 +153,65 @@
   <!-- Bottom -->
   <div class="sidebar-bottom">
 
+
+    <!-- Settings -->
     <a
       routerLink="/settings"
       routerLinkActive="active"
       class="nav-item"
+      [title]="
+        collapsed
+          ? 'Settings'
+          : ''
+      "
     >
-      <span class="nav-icon">⚙</span>
+
+      <lucide-icon
+        class="nav-icon"
+        [img]="Settings"
+        [size]="18"
+        [strokeWidth]="2"
+      ></lucide-icon>
+
 
       @if (!collapsed) {
-        <span>Settings</span>
+
+        <span>
+          Settings
+        </span>
+
       }
+
     </a>
 
-    <button class="logout-btn">
-      <span class="nav-icon">↪</span>
+
+    <!-- Sign out -->
+    <button
+      type="button"
+      class="logout-btn"
+      [title]="
+        collapsed
+          ? 'Sign out'
+          : ''
+      "
+    >
+
+      <lucide-icon
+        class="nav-icon"
+        [img]="LogOut"
+        [size]="18"
+        [strokeWidth]="2"
+      ></lucide-icon>
+
 
       @if (!collapsed) {
-        <span>Sign out</span>
+
+        <span>
+          Sign out
+        </span>
+
       }
+
     </button>
 
   </div>

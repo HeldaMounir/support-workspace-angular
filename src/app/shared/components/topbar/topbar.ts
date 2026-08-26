@@ -1,23 +1,25 @@
 import { Component } from '@angular/core';
+import {
+  LucideAngularModule,
+  Search,
+  Bell,
+  ChevronDown,
+} from 'lucide-angular';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
+  imports: [
+    LucideAngularModule,
+  ],
   templateUrl: './topbar.html',
-  styleUrl: './topbar.scss'
+  styleUrl: './topbar.scss',
 })
 export class NavbarComponent {
 
   pageTitle = 'Dashboard';
 
-  darkMode = false;
-
-  toggleTheme(): void {
-    this.darkMode = !this.darkMode;
-
-    document.body.classList.toggle(
-      'dark-theme',
-      this.darkMode
-    );
-  }
+  readonly Search = Search;
+  readonly Bell = Bell;
+  readonly ChevronDown = ChevronDown;
 }
