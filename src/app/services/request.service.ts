@@ -23,14 +23,18 @@ export class RequestService {
     'http://localhost:3001/messages';
 
 
-  // =========================
+  // =====================================================
   // REQUESTS
-  // =========================
+  // =====================================================
 
   async getRequests(): Promise<SupportRequest[]> {
+
     return firstValueFrom(
-      this.http.get<SupportRequest[]>(this.apiUrl)
+      this.http.get<SupportRequest[]>(
+        this.apiUrl
+      )
     );
+
   }
 
 
@@ -43,75 +47,109 @@ export class RequestService {
         `${this.apiUrl}/${id}`
       )
     );
+
   }
 
+
+  // =====================================================
+  // UPDATE REQUEST
+  // =====================================================
 
   async updateRequest(
     id: string,
     changes: Partial<SupportRequest>
   ): Promise<SupportRequest> {
 
+    // Get the current request first
+    const currentRequest =
+      await this.getRequestById(id);
+
+
+    // Merge old data with new data
+    const updatedRequest: SupportRequest = {
+
+      ...currentRequest,
+
+      ...changes,
+
+      updatedAt:
+        new Date().toISOString(),
+
+    };
+
+
+    // Replace the complete request
     return firstValueFrom(
-      this.http.patch<SupportRequest>(
+      this.http.put<SupportRequest>(
         `${this.apiUrl}/${id}`,
-        {
-          ...changes,
-          updatedAt: new Date().toISOString(),
-        }
+        updatedRequest
       )
     );
+
   }
 
 
-  // =========================
+  // =====================================================
   // CLAIM
-  // =========================
+  // =====================================================
 
   async claimRequest(
     id: string,
     agentId: string
   ): Promise<SupportRequest> {
 
-    return this.updateRequest(id, {
-      assignedAgentId: agentId,
-      status: 'in-progress',
-    });
+    return this.updateRequest(
+      id,
+      {
+        assignedAgentId: agentId,
+        status: 'in-progress',
+      }
+    );
+
   }
 
 
-  // =========================
+  // =====================================================
   // ASSIGN / REASSIGN
-  // =========================
+  // =====================================================
 
   async assignRequest(
     id: string,
     agentId: string | null
   ): Promise<SupportRequest> {
 
-    return this.updateRequest(id, {
-      assignedAgentId: agentId,
-    });
+    return this.updateRequest(
+      id,
+      {
+        assignedAgentId: agentId,
+      }
+    );
+
   }
 
 
-  // =========================
+  // =====================================================
   // STATUS
-  // =========================
+  // =====================================================
 
   async updateStatus(
     id: string,
     status: RequestStatus
   ): Promise<SupportRequest> {
 
-    return this.updateRequest(id, {
-      status,
-    });
+    return this.updateRequest(
+      id,
+      {
+        status,
+      }
+    );
+
   }
 
 
-  // =========================
+  // =====================================================
   // MESSAGES
-  // =========================
+  // =====================================================
 
   async getMessages(
     requestId: string
@@ -119,9 +157,10 @@ export class RequestService {
 
     return firstValueFrom(
       this.http.get<RequestMessage[]>(
-        `${this.messagesUrl}?requestId=${requestId}&_sort=createdAt&_order=asc`
+        `${this.messagesUrl}?requestId=${encodeURIComponent(requestId)}&_sort=createdAt&_order=asc`
       )
     );
+
   }
 
 
@@ -135,16 +174,18 @@ export class RequestService {
         {
           id: `MSG-${crypto.randomUUID()}`,
           ...payload,
-          createdAt: new Date().toISOString(),
+          createdAt:
+            new Date().toISOString(),
         }
       )
     );
+
   }
 
 
-  // =========================
+  // =====================================================
   // INTERNAL NOTE
-  // =========================
+  // =====================================================
 
   async addInternalNote(
     requestId: string,
@@ -153,10 +194,17 @@ export class RequestService {
   ): Promise<RequestMessage> {
 
     return this.addMessage({
+
       requestId,
+
       senderId: agentId,
+
       senderRole: 'agent',
+
       content: `[INTERNAL] ${content}`,
+
     });
+
   }
+
 }

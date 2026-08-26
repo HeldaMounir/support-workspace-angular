@@ -1,8 +1,11 @@
 <section class="requests-page">
 
+  <!-- Header -->
+
   <div class="page-header">
 
     <div>
+
       <span class="eyebrow">
         SUPPORT WORKSPACE
       </span>
@@ -12,6 +15,7 @@
       <p>
         Find, manage, and resolve customer requests.
       </p>
+
     </div>
 
   </div>
@@ -23,7 +27,7 @@
 
     <input
       type="text"
-      placeholder="Search requests..."
+      placeholder="Search by reference, title or description..."
       [ngModel]="search()"
       (ngModelChange)="search.set($event); onFilterChange()"
     />
@@ -116,7 +120,17 @@
   @if (loading()) {
 
     <div class="state">
-      Loading requests...
+
+      <div class="loading-spinner"></div>
+
+      <strong>
+        Loading requests...
+      </strong>
+
+      <span>
+        Please wait while we fetch the latest support work.
+      </span>
+
     </div>
 
   }
@@ -127,7 +141,18 @@
   @else if (error()) {
 
     <div class="state error">
-      {{ error() }}
+
+      <div class="error-icon">
+        !
+      </div>
+
+      <strong>
+        Something went wrong
+      </strong>
+
+      <span>
+        {{ error() }}
+      </span>
 
       <button
         type="button"
@@ -135,6 +160,7 @@
       >
         Retry
       </button>
+
     </div>
 
   }
@@ -145,7 +171,19 @@
   @else if (paginatedRequests().length === 0) {
 
     <div class="state">
-      No requests found.
+
+      <div class="empty-icon">
+        ✓
+      </div>
+
+      <strong>
+        No requests found
+      </strong>
+
+      <span>
+        Try changing your search or filters.
+      </span>
+
     </div>
 
   }
@@ -164,6 +202,8 @@
 
         <article class="request-card">
 
+          <!-- Card top -->
+
           <div class="card-top">
 
             <span class="reference">
@@ -180,6 +220,8 @@
           </div>
 
 
+          <!-- Request -->
+
           <h3>
             {{ request.title }}
           </h3>
@@ -189,6 +231,8 @@
             {{ request.description }}
           </p>
 
+
+          <!-- Meta -->
 
           <div class="meta">
 
@@ -203,6 +247,8 @@
           </div>
 
 
+          <!-- Footer -->
+
           <div class="card-footer">
 
             @if (request.assignedAgentId) {
@@ -216,9 +262,20 @@
               <button
                 type="button"
                 class="claim-btn"
+                [disabled]="claimingId() === request.id"
                 (click)="claimRequest(request)"
               >
-                Claim
+
+                @if (claimingId() === request.id) {
+
+                  Claiming...
+
+                } @else {
+
+                  Claim
+
+                }
+
               </button>
 
             }
@@ -257,8 +314,10 @@
 
 
       <span>
-        Page {{ currentPage() }}
-        of {{ totalPages() }}
+        Page
+        {{ currentPage() }}
+        of
+        {{ totalPages() }}
       </span>
 
 
