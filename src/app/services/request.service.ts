@@ -7,6 +7,8 @@ import {
   RequestMessage,
   RequestStatus,
   CreateMessagePayload,
+  InternalNote,
+  CreateInternalNotePayload,
 } from '../data/requests';
 
 @Injectable({
@@ -22,10 +24,13 @@ export class RequestService {
   private readonly messagesUrl =
     'http://localhost:3001/messages';
 
+  private readonly notesUrl =
+    'http://localhost:3001/internalNotes';
 
-  // =====================================================
+
+  // =====================================
   // REQUESTS
-  // =====================================================
+  // =====================================
 
   async getRequests(): Promise<SupportRequest[]> {
 
@@ -34,7 +39,6 @@ export class RequestService {
         this.apiUrl
       )
     );
-
   }
 
 
@@ -47,51 +51,36 @@ export class RequestService {
         `${this.apiUrl}/${id}`
       )
     );
-
   }
 
-
-  // =====================================================
-  // UPDATE REQUEST
-  // =====================================================
 
   async updateRequest(
     id: string,
     changes: Partial<SupportRequest>
   ): Promise<SupportRequest> {
 
-    // Get the current request first
     const currentRequest =
       await this.getRequestById(id);
 
-
-    // Merge old data with new data
     const updatedRequest: SupportRequest = {
-
       ...currentRequest,
-
       ...changes,
-
       updatedAt:
         new Date().toISOString(),
-
     };
 
-
-    // Replace the complete request
     return firstValueFrom(
       this.http.put<SupportRequest>(
         `${this.apiUrl}/${id}`,
         updatedRequest
       )
     );
-
   }
 
 
-  // =====================================================
+  // =====================================
   // CLAIM
-  // =====================================================
+  // =====================================
 
   async claimRequest(
     id: string,
@@ -105,13 +94,12 @@ export class RequestService {
         status: 'in-progress',
       }
     );
-
   }
 
 
-  // =====================================================
+  // =====================================
   // ASSIGN / REASSIGN
-  // =====================================================
+  // =====================================
 
   async assignRequest(
     id: string,
@@ -124,13 +112,12 @@ export class RequestService {
         assignedAgentId: agentId,
       }
     );
-
   }
 
 
-  // =====================================================
+  // =====================================
   // STATUS
-  // =====================================================
+  // =====================================
 
   async updateStatus(
     id: string,
@@ -143,13 +130,12 @@ export class RequestService {
         status,
       }
     );
-
   }
 
 
-  // =====================================================
-  // MESSAGES
-  // =====================================================
+  // =====================================
+  // CUSTOMER / AGENT MESSAGES
+  // =====================================
 
   async getMessages(
     requestId: string
@@ -157,10 +143,9 @@ export class RequestService {
 
     return firstValueFrom(
       this.http.get<RequestMessage[]>(
-        `${this.messagesUrl}?requestId=${encodeURIComponent(requestId)}&_sort=createdAt&_order=asc`
+        `${this.messagesUrl}?requestId=${requestId}&_sort=createdAt&_order=asc`
       )
     );
-
   }
 
 
@@ -172,39 +157,52 @@ export class RequestService {
       this.http.post<RequestMessage>(
         this.messagesUrl,
         {
-          id: `MSG-${crypto.randomUUID()}`,
+          id:
+            `MSG-${crypto.randomUUID()}`,
+
           ...payload,
+
           createdAt:
             new Date().toISOString(),
         }
       )
     );
-
   }
 
 
-  // =====================================================
-  // INTERNAL NOTE
-  // =====================================================
+  // =====================================
+  // INTERNAL NOTES
+  // =====================================
+
+  async getInternalNotes(
+    requestId: string
+  ): Promise<InternalNote[]> {
+
+    return firstValueFrom(
+      this.http.get<InternalNote[]>(
+        `${this.notesUrl}?requestId=${requestId}&_sort=createdAt&_order=asc`
+      )
+    );
+  }
+
 
   async addInternalNote(
-    requestId: string,
-    agentId: string,
-    content: string
-  ): Promise<RequestMessage> {
+    payload: CreateInternalNotePayload
+  ): Promise<InternalNote> {
 
-    return this.addMessage({
+    return firstValueFrom(
+      this.http.post<InternalNote>(
+        this.notesUrl,
+        {
+          id:
+            `NOTE-${crypto.randomUUID()}`,
 
-      requestId,
+          ...payload,
 
-      senderId: agentId,
-
-      senderRole: 'agent',
-
-      content: `[INTERNAL] ${content}`,
-
-    });
-
+          createdAt:
+            new Date().toISOString(),
+        }
+      )
+    );
   }
-
 }

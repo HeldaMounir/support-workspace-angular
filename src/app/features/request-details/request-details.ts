@@ -5,10 +5,19 @@ import {
   signal,
 } from '@angular/core';
 
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import {
+  ActivatedRoute,
+  RouterLink,
+} from '@angular/router';
 
-import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import {
+  FormsModule,
+} from '@angular/forms';
+
+import {
+  DatePipe,
+} from '@angular/common';
+
 import {
   RequestService,
 } from '../../services/request.service';
@@ -16,24 +25,31 @@ import {
 import {
   SupportRequest,
   RequestMessage,
+  InternalNote,
   RequestStatus,
 } from '../../data/requests';
 
 
 @Component({
   selector: 'app-request-details',
+
   standalone: true,
 
   imports: [
     FormsModule,
     RouterLink,
-    DatePipe
+    DatePipe,
   ],
 
-  templateUrl: './request-details.html',
-  styleUrl: './request-details.scss',
+  templateUrl:
+    './request-details.html',
+
+  styleUrl:
+    './request-details.scss',
 })
-export class RequestDetails implements OnInit {
+export class RequestDetails
+  implements OnInit {
+
 
   private readonly route =
     inject(ActivatedRoute);
@@ -42,20 +58,29 @@ export class RequestDetails implements OnInit {
     inject(RequestService);
 
 
-  // =========================
+  // =====================================
   // STATE
-  // =========================
+  // =====================================
 
   request =
-    signal<SupportRequest | null>(null);
+    signal<SupportRequest | null>(
+      null
+    );
 
   messages =
     signal<RequestMessage[]>([]);
+
+  internalNotes =
+    signal<InternalNote[]>([]);
+
 
   loading =
     signal(true);
 
   messagesLoading =
+    signal(true);
+
+  notesLoading =
     signal(true);
 
   actionLoading =
@@ -73,27 +98,46 @@ export class RequestDetails implements OnInit {
   internalNoteText = '';
 
 
+  // =====================================
+  // CURRENT AGENT
+  // =====================================
+
   readonly currentAgentId =
     'agent-001';
 
 
-  readonly statuses: RequestStatus[] = [
-    'open',
-    'in-progress',
-    'waiting-customer',
-    'resolved',
-    'closed',
-  ];
+  // =====================================
+  // STATUSES
+  // =====================================
+
+  readonly statuses:
+    RequestStatus[] = [
+
+      'open',
+
+      'in-progress',
+
+      'waiting-customer',
+
+      'resolved',
+
+      'closed',
+
+    ];
 
 
-  // =========================
+  // =====================================
   // INIT
-  // =========================
+  // =====================================
 
   async ngOnInit(): Promise<void> {
 
     const id =
-      this.route.snapshot.paramMap.get('id');
+      this.route
+        .snapshot
+        .paramMap
+        .get('id');
+
 
     if (!id) {
 
@@ -106,17 +150,22 @@ export class RequestDetails implements OnInit {
       return;
     }
 
-    await this.loadRequest(id);
 
-    await this.loadMessages(id);
+    await Promise.all([
+      this.loadRequest(id),
+      this.loadMessages(id),
+      this.loadInternalNotes(id),
+    ]);
   }
 
 
-  // =========================
+  // =====================================
   // LOAD REQUEST
-  // =========================
+  // =====================================
 
-  async loadRequest(id: string): Promise<void> {
+  async loadRequest(
+    id: string
+  ): Promise<void> {
 
     try {
 
@@ -141,16 +190,17 @@ export class RequestDetails implements OnInit {
     } finally {
 
       this.loading.set(false);
-
     }
   }
 
 
-  // =========================
+  // =====================================
   // LOAD MESSAGES
-  // =========================
+  // =====================================
 
-  async loadMessages(id: string): Promise<void> {
+  async loadMessages(
+    id: string
+  ): Promise<void> {
 
     try {
 
@@ -173,14 +223,46 @@ export class RequestDetails implements OnInit {
     } finally {
 
       this.messagesLoading.set(false);
-
     }
   }
 
 
-  // =========================
+  // =====================================
+  // LOAD INTERNAL NOTES
+  // =====================================
+
+  async loadInternalNotes(
+    id: string
+  ): Promise<void> {
+
+    try {
+
+      this.notesLoading.set(true);
+
+      const data =
+        await this.requestService
+          .getInternalNotes(id);
+
+      this.internalNotes.set(data);
+
+    } catch (error) {
+
+      console.error(error);
+
+      this.error.set(
+        'Unable to load internal notes.'
+      );
+
+    } finally {
+
+      this.notesLoading.set(false);
+    }
+  }
+
+
+  // =====================================
   // CLAIM
-  // =========================
+  // =====================================
 
   async claimRequest(): Promise<void> {
 
@@ -191,21 +273,44 @@ export class RequestDetails implements OnInit {
       return;
     }
 
+
     if (current.assignedAgentId) {
+
+      this.error.set(
+        'This request is already assigned.'
+      );
+
       return;
     }
+
+
+    if (
+      current.status === 'closed'
+    ) {
+
+      this.error.set(
+        'Closed requests cannot be claimed.'
+      );
+
+      return;
+    }
+
 
     try {
 
       this.startAction();
 
+
       const updated =
-        await this.requestService.claimRequest(
-          current.id,
-          this.currentAgentId
-        );
+        await this.requestService
+          .claimRequest(
+            current.id,
+            this.currentAgentId
+          );
+
 
       this.request.set(updated);
+
 
       this.showSuccess(
         'Request claimed successfully.'
@@ -222,14 +327,13 @@ export class RequestDetails implements OnInit {
     } finally {
 
       this.stopAction();
-
     }
   }
 
 
-  // =========================
-  // SEND MESSAGE
-  // =========================
+  // =====================================
+  // SEND CUSTOMER MESSAGE
+  // =====================================
 
   async sendMessage(): Promise<void> {
 
@@ -239,18 +343,19 @@ export class RequestDetails implements OnInit {
     const content =
       this.messageText.trim();
 
+
     if (!current || !content) {
       return;
     }
 
 
     if (
-      current.status === 'closed' ||
-      current.status === 'resolved'
+      current.status === 'resolved' ||
+      current.status === 'closed'
     ) {
 
       this.error.set(
-        'This request is no longer accepting messages.'
+        'This request is not accepting messages.'
       );
 
       return;
@@ -261,26 +366,34 @@ export class RequestDetails implements OnInit {
 
       this.startAction();
 
-      this.error.set('');
 
       const message =
-        await this.requestService.addMessage({
-          requestId: current.id,
-          senderId: this.currentAgentId,
-          senderRole: 'agent',
-          content,
-        });
+        await this.requestService
+          .addMessage({
+
+            requestId:
+              current.id,
+
+            senderId:
+              this.currentAgentId,
+
+            senderRole:
+              'agent',
+
+            content,
+          });
 
 
       this.messages.update(
-        messages => [
-          ...messages,
+        list => [
+          ...list,
           message,
         ]
       );
 
 
       this.messageText = '';
+
 
       this.showSuccess(
         'Message sent successfully.'
@@ -298,14 +411,13 @@ export class RequestDetails implements OnInit {
     } finally {
 
       this.stopAction();
-
     }
   }
 
 
-  // =========================
+  // =====================================
   // INTERNAL NOTE
-  // =========================
+  // =====================================
 
   async addInternalNote(): Promise<void> {
 
@@ -314,6 +426,7 @@ export class RequestDetails implements OnInit {
 
     const content =
       this.internalNoteText.trim();
+
 
     if (!current || !content) {
       return;
@@ -324,24 +437,31 @@ export class RequestDetails implements OnInit {
 
       this.startAction();
 
+
       const note =
         await this.requestService
-          .addInternalNote(
-            current.id,
-            this.currentAgentId,
-            content
-          );
+          .addInternalNote({
+
+            requestId:
+              current.id,
+
+            authorId:
+              this.currentAgentId,
+
+            content,
+          });
 
 
-      this.messages.update(
-        messages => [
-          ...messages,
+      this.internalNotes.update(
+        list => [
+          ...list,
           note,
         ]
       );
 
 
       this.internalNoteText = '';
+
 
       this.showSuccess(
         'Internal note added.'
@@ -359,14 +479,13 @@ export class RequestDetails implements OnInit {
     } finally {
 
       this.stopAction();
-
     }
   }
 
 
-  // =========================
+  // =====================================
   // UPDATE STATUS
-  // =========================
+  // =====================================
 
   async updateStatus(
     status: RequestStatus
@@ -375,7 +494,15 @@ export class RequestDetails implements OnInit {
     const current =
       this.request();
 
+
     if (!current) {
+      return;
+    }
+
+
+    if (
+      current.status === status
+    ) {
       return;
     }
 
@@ -384,6 +511,7 @@ export class RequestDetails implements OnInit {
 
       this.startAction();
 
+
       const updated =
         await this.requestService
           .updateStatus(
@@ -391,10 +519,12 @@ export class RequestDetails implements OnInit {
             status
           );
 
+
       this.request.set(updated);
 
+
       this.showSuccess(
-        `Status changed to ${status}.`
+        `Status changed to ${this.statusLabel(status)}.`
       );
 
 
@@ -409,35 +539,96 @@ export class RequestDetails implements OnInit {
     } finally {
 
       this.stopAction();
-
     }
   }
 
 
-  // =========================
-  // HELPERS
-  // =========================
+  // =====================================
+  // STATUS LABEL
+  // =====================================
 
-  isInternalNote(
-    message: RequestMessage
-  ): boolean {
+  statusLabel(
+    status: RequestStatus
+  ): string {
 
-    return message.content.startsWith(
-      '[INTERNAL]'
+    const labels:
+      Record<RequestStatus, string> = {
+
+        open:
+          'Open',
+
+        'in-progress':
+          'In Progress',
+
+        'waiting-customer':
+          'Waiting for Customer',
+
+        resolved:
+          'Resolved',
+
+        closed:
+          'Closed',
+      };
+
+
+    return labels[status];
+  }
+
+
+  // =====================================
+  // STATUS CLASS
+  // =====================================
+
+  statusClass(
+    status: RequestStatus
+  ): string {
+
+    return status;
+  }
+
+
+  // =====================================
+  // ACTION HELPERS
+  // =====================================
+
+  canSendMessage(): boolean {
+
+    const status =
+      this.request()?.status;
+
+    return (
+      status !== 'resolved' &&
+      status !== 'closed'
     );
   }
 
 
-  cleanMessage(
-    message: RequestMessage
-  ): string {
+  canAddNote(): boolean {
 
-    return message.content.replace(
-      '[INTERNAL]',
-      ''
-    ).trim();
+    return this.request()?.status !==
+      'closed';
   }
 
+
+  canClaim(): boolean {
+
+    const current =
+      this.request();
+
+    if (!current) {
+      return false;
+    }
+
+    return (
+      !current.assignedAgentId &&
+      current.status !== 'closed'
+    );
+  }
+
+
+  // =====================================
+  // START / STOP
+  // =====================================
 
   startAction(): void {
 
@@ -446,27 +637,26 @@ export class RequestDetails implements OnInit {
     this.error.set('');
 
     this.success.set('');
-
   }
 
 
   stopAction(): void {
 
     this.actionLoading.set(false);
-
   }
 
 
-  showSuccess(message: string): void {
+  showSuccess(
+    message: string
+  ): void {
 
     this.success.set(message);
+
 
     setTimeout(() => {
 
       this.success.set('');
 
     }, 3000);
-
   }
-
 }

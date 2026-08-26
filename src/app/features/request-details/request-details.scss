@@ -649,3 +649,192 @@
   }
 
 }
+/* =========================================
+   NEW WORKFLOW UI
+========================================= */
+
+.conversation-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background: #f3efff;
+
+  color: #6d28d9;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: .5px;
+}
+
+
+.status-value {
+  padding: 5px 8px;
+
+  border-radius: 7px;
+
+  font-size: 10px !important;
+}
+
+.status-value.open {
+  background: #fff4e4;
+  color: #b86d00;
+}
+
+.status-value.in-progress {
+  background: #edf4ff;
+  color: #3267ba;
+}
+
+.status-value.waiting-customer {
+  background: #fff7e7;
+  color: #b77908;
+}
+
+.status-value.resolved {
+  background: #ecf8ef;
+  color: #26844b;
+}
+
+.status-value.closed {
+  background: #f1f2f5;
+  color: #697184;
+}
+
+
+.status-actions button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+
+  flex: 0 0 7px;
+
+  border-radius: 50%;
+
+  background: #c5c9d2;
+}
+
+
+.status-actions button.current
+.status-dot {
+  background: #7c3aed;
+}
+
+
+.internal-section {
+  box-shadow:
+    0 8px 30px rgba(109, 40, 217, .04);
+}
+
+
+.internal-note {
+  position: relative;
+
+  overflow: hidden;
+}
+
+
+.internal-note::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  width: 3px;
+
+  background: #8b5cf6;
+}
+
+
+.closed-message {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+
+.closed-message strong {
+  color: #4b5563;
+
+  font-size: 12px;
+}
+
+
+.closed-message span {
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+
+.state-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  min-height: 240px;
+}
+
+
+.state-card strong {
+  color: #252b3a;
+
+  font-size: 17px;
+}
+
+
+.state-card p {
+  margin: 0;
+
+  color: #8c94a4;
+
+  font-size: 12px;
+}
+
+
+.state-card button {
+  margin-top: 8px;
+
+  padding: 10px 17px;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  background: #171321;
+
+  color: white;
+
+  font-family: inherit;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.state-card button:hover {
+  background: #2b2137;
+}

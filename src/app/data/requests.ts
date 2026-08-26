@@ -1,3 +1,8 @@
+export type UserRole =
+  | 'customer'
+  | 'agent'
+  | 'manager';
+
 export type RequestStatus =
   | 'open'
   | 'in-progress'
@@ -18,25 +23,25 @@ export type RequestCategory =
   | 'General'
   | 'Orders';
 
-export type UserRole =
-  | 'customer'
-  | 'agent'
-  | 'manager';
-
 export interface SupportRequest {
   id: string;
 
   title: string;
+
   description: string;
 
   category: RequestCategory | string;
+
   priority: RequestPriority;
+
   status: RequestStatus;
 
   customerId: string;
+
   assignedAgentId: string | null;
 
   createdAt: string;
+
   updatedAt: string;
 }
 
@@ -46,7 +51,20 @@ export interface RequestMessage {
   requestId: string;
 
   senderId: string;
-  senderRole: UserRole;
+
+  senderRole: 'customer' | 'agent' | 'manager';
+
+  content: string;
+
+  createdAt: string;
+}
+
+export interface InternalNote {
+  id: string;
+
+  requestId: string;
+
+  authorId: string;
 
   content: string;
 
@@ -55,7 +73,18 @@ export interface RequestMessage {
 
 export interface CreateMessagePayload {
   requestId: string;
+
   senderId: string;
-  senderRole: UserRole;
+
+  senderRole: 'customer' | 'agent' | 'manager';
+
+  content: string;
+}
+
+export interface CreateInternalNotePayload {
+  requestId: string;
+
+  authorId: string;
+
   content: string;
 }

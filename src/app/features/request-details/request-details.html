@@ -1,7 +1,5 @@
 <section class="details-page">
 
-  <!-- Back -->
-
   <a
     routerLink="/requests"
     class="back-link"
@@ -9,8 +7,6 @@
     ← Back to requests
   </a>
 
-
-  <!-- Loading -->
 
   @if (loading()) {
 
@@ -20,11 +16,17 @@
 
   }
 
-
   @else if (error() && !request()) {
 
     <div class="state-card error">
-      {{ error() }}
+
+      <strong>
+        Something went wrong
+      </strong>
+
+      <p>
+        {{ error() }}
+      </p>
 
       <button
         type="button"
@@ -32,22 +34,24 @@
       >
         Retry
       </button>
+
     </div>
 
   }
-
 
   @else if (request()) {
 
     <div class="details-layout">
 
-      <!-- =====================
+
+      <!-- =================================
            MAIN
-      ====================== -->
+      ================================== -->
 
-      <div class="main-column">
+      <main class="main-column">
 
-        <!-- Header -->
+
+        <!-- HEADER -->
 
         <div class="request-header">
 
@@ -80,7 +84,7 @@
         </div>
 
 
-        <!-- Feedback -->
+        <!-- FEEDBACK -->
 
         @if (success()) {
 
@@ -89,6 +93,7 @@
           </div>
 
         }
+
 
         @if (error()) {
 
@@ -99,19 +104,29 @@
         }
 
 
-        <!-- Conversation -->
+        <!-- =================================
+             CONVERSATION
+        ================================== -->
 
         <section class="section-card">
 
           <div class="section-heading">
 
             <div>
-              <h2>Conversation</h2>
+
+              <h2>
+                Conversation
+              </h2>
 
               <p>
                 Customer and support communication
               </p>
+
             </div>
+
+            <span class="conversation-badge">
+              Customer visible
+            </span>
 
           </div>
 
@@ -124,7 +139,6 @@
 
           }
 
-
           @else if (messages().length === 0) {
 
             <div class="conversation-state">
@@ -132,7 +146,6 @@
             </div>
 
           }
-
 
           @else {
 
@@ -143,41 +156,37 @@
                 track message.id
               ) {
 
-                @if (!isInternalNote(message)) {
+                <article
+                  class="message"
+                  [class.agent-message]="
+                    message.senderRole === 'agent'
+                  "
+                >
 
-                  <div
-                    class="message"
-                    [class.agent-message]="
-                      message.senderRole === 'agent'
-                    "
-                  >
+                  <div class="message-meta">
 
-                    <div class="message-meta">
+                    <strong>
+                      {{
+                        message.senderRole === 'agent'
+                          ? 'Support Agent'
+                          : 'Customer'
+                      }}
+                    </strong>
 
-                      <strong>
-                        {{
-                          message.senderRole === 'agent'
-                            ? 'Support Agent'
-                            : 'Customer'
-                        }}
-                      </strong>
-
-                      <span>
-                        {{
-                          message.createdAt
-                            | date:'MMM d, h:mm a'
-                        }}
-                      </span>
-
-                    </div>
-
-                    <p>
-                      {{ cleanMessage(message) }}
-                    </p>
+                    <span>
+                      {{
+                        message.createdAt
+                          | date:'MMM d, h:mm a'
+                      }}
+                    </span>
 
                   </div>
 
-                }
+                  <p>
+                    {{ message.content }}
+                  </p>
+
+                </article>
 
               }
 
@@ -186,12 +195,9 @@
           }
 
 
-          <!-- Reply -->
+          <!-- REPLY -->
 
-          @if (
-            request()!.status !== 'closed' &&
-            request()!.status !== 'resolved'
-          ) {
+          @if (canSendMessage()) {
 
             <div class="composer">
 
@@ -199,13 +205,14 @@
                 [(ngModel)]="messageText"
                 placeholder="Write a message to the customer..."
                 rows="4"
+                [disabled]="actionLoading()"
               ></textarea>
 
 
               <div class="composer-footer">
 
                 <span>
-                  Your message will be visible to the customer.
+                  This message will be visible to the customer.
                 </span>
 
                 <button
@@ -233,8 +240,16 @@
           @else {
 
             <div class="closed-message">
-              This request is {{ request()!.status }}.
-              Normal communication is disabled.
+
+              <strong>
+                Communication paused
+              </strong>
+
+              <span>
+                This request is
+                {{ statusLabel(request()!.status) }}.
+              </span>
+
             </div>
 
           }
@@ -242,37 +257,59 @@
         </section>
 
 
-        <!-- Internal Notes -->
+        <!-- =================================
+             INTERNAL NOTES
+        ================================== -->
 
         <section class="section-card internal-section">
 
           <div class="section-heading">
 
             <div>
-              <h2>Internal Support Notes</h2>
+
+              <h2>
+                Internal Support Notes
+              </h2>
 
               <p>
-                Visible only to support employees.
+                Private communication for support employees.
               </p>
+
             </div>
 
             <span class="private-badge">
-              PRIVATE
+              🔒 PRIVATE
             </span>
 
           </div>
 
 
-          <div class="internal-notes">
+          @if (notesLoading()) {
 
-            @for (
-              message of messages();
-              track message.id
-            ) {
+            <div class="conversation-state">
+              Loading internal notes...
+            </div>
 
-              @if (isInternalNote(message)) {
+          }
 
-                <div class="internal-note">
+          @else if (internalNotes().length === 0) {
+
+            <div class="conversation-state">
+              No internal notes yet.
+            </div>
+
+          }
+
+          @else {
+
+            <div class="internal-notes">
+
+              @for (
+                note of internalNotes();
+                track note.id
+              ) {
+
+                <article class="internal-note">
 
                   <div class="note-header">
 
@@ -282,7 +319,7 @@
 
                     <span>
                       {{
-                        message.createdAt
+                        note.createdAt
                           | date:'MMM d, h:mm a'
                       }}
                     </span>
@@ -290,69 +327,82 @@
                   </div>
 
                   <p>
-                    {{ cleanMessage(message) }}
+                    {{ note.content }}
                   </p>
 
-                </div>
+                </article>
 
               }
 
-            }
+            </div>
 
-          </div>
-
-
-          <textarea
-            [(ngModel)]="internalNoteText"
-            placeholder="Add an internal note for the support team..."
-            rows="3"
-          ></textarea>
+          }
 
 
-          <div class="note-footer">
+          @if (canAddNote()) {
 
-            <span>
-              Customers cannot see internal notes.
-            </span>
+            <textarea
+              [(ngModel)]="internalNoteText"
+              placeholder="Add an internal note for the support team..."
+              rows="3"
+              [disabled]="actionLoading()"
+            ></textarea>
 
-            <button
-              type="button"
-              class="secondary-btn"
-              [disabled]="
-                actionLoading() ||
-                !internalNoteText.trim()
-              "
-              (click)="addInternalNote()"
-            >
-              Add internal note
-            </button>
 
-          </div>
+            <div class="note-footer">
+
+              <span>
+                Customers cannot see these notes.
+              </span>
+
+              <button
+                type="button"
+                class="secondary-btn"
+                [disabled]="
+                  actionLoading() ||
+                  !internalNoteText.trim()
+                "
+                (click)="addInternalNote()"
+              >
+                Add internal note
+              </button>
+
+            </div>
+
+          }
 
         </section>
 
-      </div>
+      </main>
 
 
-      <!-- =====================
+      <!-- =================================
            SIDEBAR
-      ====================== -->
+      ================================== -->
 
       <aside class="details-sidebar">
 
-        <!-- Request info -->
+
+        <!-- REQUEST INFO -->
 
         <div class="info-card">
 
-          <h3>Request information</h3>
+          <h3>
+            Request information
+          </h3>
 
 
           <div class="info-row">
 
-            <span>Status</span>
+            <span>
+              Status
+            </span>
 
-            <strong>
-              {{ request()!.status }}
+            <strong
+              class="status-value"
+              [class]="statusClass(request()!.status)"
+            >
+              {{ statusLabel(request()!.status) }}
             </strong>
 
           </div>
@@ -360,7 +410,9 @@
 
           <div class="info-row">
 
-            <span>Priority</span>
+            <span>
+              Priority
+            </span>
 
             <strong>
               {{ request()!.priority }}
@@ -371,7 +423,9 @@
 
           <div class="info-row">
 
-            <span>Category</span>
+            <span>
+              Category
+            </span>
 
             <strong>
               {{ request()!.category }}
@@ -382,7 +436,9 @@
 
           <div class="info-row">
 
-            <span>Customer</span>
+            <span>
+              Customer
+            </span>
 
             <strong>
               {{ request()!.customerId }}
@@ -393,7 +449,9 @@
 
           <div class="info-row">
 
-            <span>Assigned to</span>
+            <span>
+              Assigned to
+            </span>
 
             <strong>
               {{
@@ -407,16 +465,18 @@
         </div>
 
 
-        <!-- Assignment -->
+        <!-- =================================
+             ASSIGNMENT
+        ================================== -->
 
         <div class="info-card">
 
-          <h3>Assignment</h3>
+          <h3>
+            Assignment
+          </h3>
 
 
-          @if (
-            !request()!.assignedAgentId
-          ) {
+          @if (canClaim()) {
 
             <button
               type="button"
@@ -433,13 +493,26 @@
 
           }
 
-          @else {
+          @else if (request()!.assignedAgentId) {
 
             <div class="assigned-box">
-              ✓ Assigned to
+
+              <span>
+                ✓ Assigned to
+              </span>
+
               <strong>
                 {{ request()!.assignedAgentId }}
               </strong>
+
+            </div>
+
+          }
+
+          @else {
+
+            <div class="assigned-box">
+              This request cannot be assigned.
             </div>
 
           }
@@ -447,11 +520,15 @@
         </div>
 
 
-        <!-- Status -->
+        <!-- =================================
+             STATUS
+        ================================== -->
 
         <div class="info-card">
 
-          <h3>Update status</h3>
+          <h3>
+            Update status
+          </h3>
 
 
           <div class="status-actions">
@@ -472,7 +549,11 @@
                 "
                 (click)="updateStatus(status)"
               >
-                {{ status }}
+
+                <span class="status-dot"></span>
+
+                {{ statusLabel(status) }}
+
               </button>
 
             }
@@ -482,15 +563,22 @@
         </div>
 
 
-        <!-- Dates -->
+        <!-- =================================
+             ACTIVITY
+        ================================== -->
 
         <div class="info-card">
 
-          <h3>Activity</h3>
+          <h3>
+            Activity
+          </h3>
+
 
           <div class="info-row">
 
-            <span>Created</span>
+            <span>
+              Created
+            </span>
 
             <strong>
               {{
@@ -501,9 +589,12 @@
 
           </div>
 
+
           <div class="info-row">
 
-            <span>Updated</span>
+            <span>
+              Last updated
+            </span>
 
             <strong>
               {{
