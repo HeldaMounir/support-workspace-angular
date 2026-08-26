@@ -1,6 +1,7 @@
 export type RequestStatus =
   | 'open'
   | 'in-progress'
+  | 'waiting-customer'
   | 'resolved'
   | 'closed';
 
@@ -17,8 +18,14 @@ export type RequestCategory =
   | 'General'
   | 'Orders';
 
+export type UserRole =
+  | 'customer'
+  | 'agent'
+  | 'manager';
+
 export interface SupportRequest {
   id: string;
+
   title: string;
   description: string;
 
@@ -31,4 +38,24 @@ export interface SupportRequest {
 
   createdAt: string;
   updatedAt: string;
+}
+
+export interface RequestMessage {
+  id: string;
+
+  requestId: string;
+
+  senderId: string;
+  senderRole: UserRole;
+
+  content: string;
+
+  createdAt: string;
+}
+
+export interface CreateMessagePayload {
+  requestId: string;
+  senderId: string;
+  senderRole: UserRole;
+  content: string;
 }

@@ -11,6 +11,7 @@ import {
 
 import {
   SupportRequest,
+  type RequestStatus,
 } from '../../data/requests';
 
 type StatTone =
@@ -133,25 +134,15 @@ export class Dashboard implements OnInit {
     status: SupportRequest['status']
   ): string {
 
-    const labels: Record<
-      SupportRequest['status'],
-      string
-    > = {
+    const statusLabels: Record<RequestStatus, string> = {
+  open: 'Open',
+  'in-progress': 'In Progress',
+  'waiting-customer': 'Waiting for Customer',
+  resolved: 'Resolved',
+  closed: 'Closed',
+};
 
-      open: 'Open',
-
-      'in-progress':
-        'In Progress',
-
-      resolved:
-        'Resolved',
-
-      closed:
-        'Closed',
-
-    };
-
-    return labels[status];
+    return statusLabels[status];
   }
 
   getPriorityLabel(

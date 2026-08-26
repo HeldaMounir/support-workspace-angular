@@ -1,214 +1,251 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  computed,
+  signal
+} from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import {
-  RequestPriority,
-  RequestStatus,
-  SupportRequest,
-} from '../../data/requests';
+  RequestService
+} from '../../services/request.service';
 
-import { RequestService } from '../../services/request.service';
+import {
+  SupportRequest,
+  RequestStatus,
+  RequestPriority
+} from '../../data/requests';
 
 @Component({
   selector: 'app-requests',
   standalone: true,
+
   imports: [
     FormsModule,
-    RouterLink,
+    RouterLink
   ],
+
   templateUrl: './requests.html',
-  styleUrl: './requests.scss',
+  styleUrl: './requests.scss'
 })
-export class Requests {
+export class Requests implements OnInit {
 
   private readonly requestService =
     inject(RequestService);
 
-  requests: SupportRequest[] = [];
 
-  searchTerm = '';
+  requests = signal<SupportRequest[]>([]);
 
-  selectedStatus: 'all' | RequestStatus = 'all';
+  loading = signal(true);
 
-  selectedPriority: 'all' | RequestPriority = 'all';
+  error = signal('');
 
-  loading = true;
+  search = signal('');
 
-  error = '';
+  statusFilter =
+    signal<RequestStatus | 'all'>('all');
+
+  priorityFilter =
+    signal<RequestPriority | 'all'>('all');
+
+  assignmentFilter =
+    signal<'all' | 'assigned' | 'unassigned'>('all');
+
+  currentPage = signal(1);
+
+  pageSize = 6;
 
 
-  constructor() {
-    this.loadRequests();
+  filteredRequests = computed(() => {
+
+    const search =
+      this.search().toLowerCase().trim();
+
+    const status =
+      this.statusFilter();
+
+    const priority =
+      this.priorityFilter();
+
+    const assignment =
+      this.assignmentFilter();
+
+
+    return this.requests().filter(request => {
+
+      const matchesSearch =
+        !search ||
+        request.id.toLowerCase().includes(search) ||
+        request.title.toLowerCase().includes(search) ||
+        request.description.toLowerCase().includes(search);
+
+
+      const matchesStatus =
+        status === 'all' ||
+        request.status === status;
+
+
+      const matchesPriority =
+        priority === 'all' ||
+        request.priority === priority;
+
+
+      const matchesAssignment =
+        assignment === 'all' ||
+
+        (assignment === 'assigned' &&
+          request.assignedAgentId !== null) ||
+
+        (assignment === 'unassigned' &&
+          request.assignedAgentId === null);
+
+
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesPriority &&
+        matchesAssignment
+      );
+
+    });
+
+  });
+
+
+  totalPages = computed(() =>
+    Math.max(
+      1,
+      Math.ceil(
+        this.filteredRequests().length /
+        this.pageSize
+      )
+    )
+  );
+
+
+  paginatedRequests = computed(() => {
+
+    const start =
+      (this.currentPage() - 1) *
+      this.pageSize;
+
+    return this.filteredRequests()
+      .slice(
+        start,
+        start + this.pageSize
+      );
+
+  });
+
+
+  async ngOnInit(): Promise<void> {
+
+    await this.loadRequests();
+
   }
 
 
   async loadRequests(): Promise<void> {
 
-    this.loading = true;
-    this.error = '';
-
     try {
 
-      this.requests =
+      this.loading.set(true);
+
+      this.error.set('');
+
+      const data =
         await this.requestService.getRequests();
+
+      this.requests.set(data);
 
     } catch (error) {
 
-      console.error(
-        'Failed to load requests:',
-        error
-      );
+      console.error(error);
 
-      this.error =
-        'Failed to load requests. Please try again.';
+      this.error.set(
+        'Unable to load requests. Please try again.'
+      );
 
     } finally {
 
-      this.loading = false;
+      this.loading.set(false);
 
     }
+
   }
 
 
-  get filteredRequests(): SupportRequest[] {
+  onFilterChange(): void {
 
-    const search =
-      this.searchTerm
-        .trim()
-        .toLowerCase();
+    this.currentPage.set(1);
 
-    return this.requests.filter(
-      (request: SupportRequest) => {
+  }
 
-        const matchesSearch =
-          !search ||
-          request.id.toLowerCase().includes(search) ||
-          request.title.toLowerCase().includes(search) ||
-          request.description.toLowerCase().includes(search) ||
-          request.category.toLowerCase().includes(search);
 
-        const matchesStatus =
-          this.selectedStatus === 'all' ||
-          request.status === this.selectedStatus;
+  nextPage(): void {
 
-        const matchesPriority =
-          this.selectedPriority === 'all' ||
-          request.priority === this.selectedPriority;
+    if (
+      this.currentPage() <
+      this.totalPages()
+    ) {
+      this.currentPage.update(
+        page => page + 1
+      );
+    }
 
-        return (
-          matchesSearch &&
-          matchesStatus &&
-          matchesPriority
+  }
+
+
+  previousPage(): void {
+
+    if (
+      this.currentPage() > 1
+    ) {
+      this.currentPage.update(
+        page => page - 1
+      );
+    }
+
+  }
+
+
+  async claimRequest(
+    request: SupportRequest
+  ): Promise<void> {
+
+    if (request.assignedAgentId) {
+      return;
+    }
+
+    try {
+
+      const updated =
+        await this.requestService.claimRequest(
+          request.id,
+          'agent-001'
         );
-      }
-    );
-  }
 
+      this.requests.update(
+        requests =>
+          requests.map(item =>
+            item.id === updated.id
+              ? updated
+              : item
+          )
+      );
 
-  get totalRequests(): number {
+    } catch (error) {
 
-    return this.requests.length;
+      console.error(error);
 
-  }
+      this.error.set(
+        'Could not claim this request.'
+      );
 
-
-  get openRequests(): number {
-
-    return this.requests.filter(
-      (request: SupportRequest) =>
-        request.status === 'open'
-    ).length;
-
-  }
-
-
-  get inProgressRequests(): number {
-
-    return this.requests.filter(
-      (request: SupportRequest) =>
-        request.status === 'in-progress'
-    ).length;
-
-  }
-
-
-  get resolvedRequests(): number {
-
-    return this.requests.filter(
-      (request: SupportRequest) =>
-        request.status === 'resolved'
-    ).length;
-
-  }
-
-
-  getStatusLabel(
-    status: RequestStatus
-  ): string {
-
-    const labels: Record<
-      RequestStatus,
-      string
-    > = {
-      open: 'Open',
-      'in-progress': 'In Progress',
-      resolved: 'Resolved',
-      closed: 'Closed',
-    };
-
-    return labels[status];
-
-  }
-
-
-  getPriorityLabel(
-    priority: RequestPriority
-  ): string {
-
-    const labels: Record<
-      RequestPriority,
-      string
-    > = {
-      low: 'Low',
-      medium: 'Medium',
-      high: 'High',
-      urgent: 'Urgent',
-    };
-
-    return labels[priority];
-
-  }
-
-
-  formatDate(date: string): string {
-
-    return new Intl.DateTimeFormat(
-      'en-US',
-      {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      }
-    ).format(new Date(date));
-
-  }
-
-
-  clearFilters(): void {
-
-    this.searchTerm = '';
-
-    this.selectedStatus = 'all';
-
-    this.selectedPriority = 'all';
-
-  }
-
-
-  retry(): void {
-
-    this.loadRequests();
+    }
 
   }
 }
