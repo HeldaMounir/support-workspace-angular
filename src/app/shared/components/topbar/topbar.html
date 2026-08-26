@@ -1,0 +1,66 @@
+<header class="navbar">
+
+  <!-- Left -->
+  <div class="navbar-left">
+
+    <div class="page-info">
+      <span class="page-label">Workspace</span>
+      <h1>{{ pageTitle }}</h1>
+    </div>
+
+  </div>
+
+
+  <!-- Right -->
+  <div class="navbar-right">
+
+    <!-- Search -->
+    <button class="icon-btn search-btn">
+      <span>⌕</span>
+    </button>
+
+
+    <!-- Notifications -->
+    <button class="icon-btn notification-btn">
+      <span>♢</span>
+      <span class="notification-dot"></span>
+    </button>
+
+
+    <!-- THEME TOGGLE -->
+    <button
+      class="theme-btn"
+      (click)="toggleTheme()"
+      [attr.aria-label]="darkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      @if (darkMode) {
+        <span class="theme-icon">☀</span>
+      } @else {
+        <span class="theme-icon">☾</span>
+      }
+    </button>
+
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+
+    <!-- User -->
+    <div class="user-profile">
+
+      <div class="avatar">
+        HM
+      </div>
+
+      <div class="user-info">
+        <span class="user-name">Helda</span>
+        <span class="user-role">Support Agent</span>
+      </div>
+
+      <span class="chevron">⌄</span>
+
+    </div>
+
+  </div>
+
+</header>

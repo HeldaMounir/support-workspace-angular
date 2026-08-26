@@ -1,0 +1,203 @@
+<div class="login-page">
+
+  <div class="login-background">
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+  </div>
+
+  <main class="login-container">
+
+    <!-- Brand -->
+
+    <div class="login-brand">
+
+      <div class="brand-mark">
+        <span>✦</span>
+      </div>
+
+      <div>
+        <strong>Supportly</strong>
+        <span>Support Workspace</span>
+      </div>
+
+    </div>
+
+    <!-- Card -->
+
+    <section class="login-card">
+
+      <div class="login-header">
+
+        <span class="eyebrow">
+          SUPPORT CENTER
+        </span>
+
+        <h1>
+          Welcome back
+        </h1>
+
+        <p>
+          Sign in to manage your support workspace.
+        </p>
+
+      </div>
+
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="submit()"
+        novalidate
+      >
+
+        <!-- Email -->
+
+        <div class="form-field">
+
+          <label for="email">
+            Email address
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email"
+            autocomplete="email"
+          />
+
+          @if (email.invalid && email.touched) {
+
+            <span class="field-error">
+
+              @if (email.errors?.['required']) {
+                Email is required.
+              }
+
+              @if (email.errors?.['email']) {
+                Please enter a valid email.
+              }
+
+            </span>
+
+          }
+
+        </div>
+
+        <!-- Password -->
+
+        <div class="form-field">
+
+          <div class="label-row">
+
+            <label for="password">
+              Password
+            </label>
+
+            <span>
+              Test account
+            </span>
+
+          </div>
+
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+          />
+
+          @if (
+            password.invalid &&
+            password.touched
+          ) {
+
+            <span class="field-error">
+
+              @if (password.errors?.['required']) {
+                Password is required.
+              }
+
+              @if (password.errors?.['minlength']) {
+                Password must be at least 6 characters.
+              }
+
+            </span>
+
+          }
+
+        </div>
+
+        <!-- Error -->
+
+        @if (errorMessage) {
+
+          <div class="login-error">
+            {{ errorMessage }}
+          </div>
+
+        }
+
+        <!-- Submit -->
+
+        <button
+          type="submit"
+          class="login-button"
+          [disabled]="loginForm.invalid"
+        >
+          Sign in
+          <span>→</span>
+        </button>
+
+      </form>
+
+      <!-- Test accounts -->
+
+      <div class="test-accounts">
+
+        <div class="test-title">
+          Demo accounts
+        </div>
+
+        <button
+          type="button"
+          class="demo-account"
+          (click)="loginForm.patchValue({
+            email: 'agent@example.com',
+            password: '123456'
+          })"
+        >
+          <span>
+            <strong>Ahmed Support</strong>
+            <small>Support Agent</small>
+          </span>
+
+          <span>→</span>
+        </button>
+
+        <button
+          type="button"
+          class="demo-account"
+          (click)="loginForm.patchValue({
+            email: 'manager@example.com',
+            password: '123456'
+          })"
+        >
+          <span>
+            <strong>Mona Manager</strong>
+            <small>Support Manager</small>
+          </span>
+
+          <span>→</span>
+        </button>
+
+      </div>
+
+    </section>
+
+    <p class="login-footer">
+      Supportly Customer Care · Secure Support Workspace
+    </p>
+
+  </main>
+
+</div>

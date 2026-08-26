@@ -1,0 +1,134 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+
+  <!-- Logo -->
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <span>CS</span>
+      </div>
+
+      @if (!collapsed) {
+        <div class="logo-text">
+          <span class="logo-title">Support</span>
+          <span class="logo-subtitle">Workspace</span>
+        </div>
+      }
+    </div>
+
+    <button class="collapse-btn" (click)="toggleSidebar()">
+      <span>{{ collapsed ? '→' : '←' }}</span>
+    </button>
+  </div>
+
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+
+    <div class="nav-section">
+      @if (!collapsed) {
+        <p class="section-title">MAIN</p>
+      }
+
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        class="nav-item"
+        [title]="collapsed ? 'Dashboard' : ''"
+      >
+        <span class="nav-icon">⌂</span>
+
+        @if (!collapsed) {
+          <span>Dashboard</span>
+        }
+      </a>
+
+      <a
+        routerLink="/requests"
+        routerLinkActive="active"
+        class="nav-item"
+        [title]="collapsed ? 'Requests' : ''"
+      >
+        <span class="nav-icon">▣</span>
+
+        @if (!collapsed) {
+          <span>Requests</span>
+          <span class="nav-badge">12</span>
+        }
+      </a>
+
+      <a
+        routerLink="/create-request"
+        routerLinkActive="active"
+        class="nav-item"
+        [title]="collapsed ? 'Create Request' : ''"
+      >
+        <span class="nav-icon">＋</span>
+
+        @if (!collapsed) {
+          <span>Create Request</span>
+        }
+      </a>
+    </div>
+
+
+    <div class="nav-section">
+      @if (!collapsed) {
+        <p class="section-title">MANAGEMENT</p>
+      }
+
+      <a
+        routerLink="/users"
+        routerLinkActive="active"
+        class="nav-item"
+        [title]="collapsed ? 'Users' : ''"
+      >
+        <span class="nav-icon">♙</span>
+
+        @if (!collapsed) {
+          <span>Users</span>
+        }
+      </a>
+
+      <a
+        routerLink="/reports"
+        routerLinkActive="active"
+        class="nav-item"
+        [title]="collapsed ? 'Reports' : ''"
+      >
+        <span class="nav-icon">▥</span>
+
+        @if (!collapsed) {
+          <span>Reports</span>
+        }
+      </a>
+    </div>
+
+  </nav>
+
+
+  <!-- Bottom -->
+  <div class="sidebar-bottom">
+
+    <a
+      routerLink="/settings"
+      routerLinkActive="active"
+      class="nav-item"
+    >
+      <span class="nav-icon">⚙</span>
+
+      @if (!collapsed) {
+        <span>Settings</span>
+      }
+    </a>
+
+    <button class="logout-btn">
+      <span class="nav-icon">↪</span>
+
+      @if (!collapsed) {
+        <span>Sign out</span>
+      }
+    </button>
+
+  </div>
+
+</aside>

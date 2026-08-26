@@ -1,0 +1,172 @@
+.sidebar {
+  width: 260px;
+  flex-shrink: 0; // مهم: يمنع الـ sidebar إنه يتقلص أو المحتوى يزحف عليه
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  border-right: 1px solid #eef0f3;
+  transition: width 0.2s ease;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  &.collapsed {
+    width: 76px;
+  }
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 16px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #6d28d9;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.logo-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #111827;
+}
+
+.logo-subtitle {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.collapse-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  padding: 0 12px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+
+  &:hover {
+    background: #f9fafb;
+  }
+
+  &.active {
+    background: #f3f0ff;
+    color: #6d28d9;
+    font-weight: 600;
+  }
+}
+
+.nav-icon {
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: #6d28d9;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.sidebar-bottom {
+  padding: 12px;
+  border-top: 1px solid #eef0f3;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+
+  &:hover {
+    background: #fef2f2;
+  }
+}

@@ -1,0 +1,564 @@
+<section class="requests-page">
+
+  <!-- ========================= -->
+  <!-- Header -->
+  <!-- ========================= -->
+
+  <div class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        SUPPORT OPERATIONS
+      </span>
+
+      <h1>
+        Customer Requests
+      </h1>
+
+      <p>
+        Manage and track all customer support requests.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- Loading -->
+  <!-- ========================= -->
+
+  @if (loading) {
+
+    <div class="loading-state">
+
+      <div class="loading-spinner"></div>
+
+      <h3>
+        Loading requests...
+      </h3>
+
+      <p>
+        Please wait while we load the customer requests.
+      </p>
+
+    </div>
+
+  }
+
+
+  <!-- ========================= -->
+  <!-- Error -->
+  <!-- ========================= -->
+
+  @if (!loading && error) {
+
+    <div class="error-state">
+
+      <div class="error-icon">
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+          ></circle>
+
+          <path d="M12 8v4"></path>
+
+          <path d="M12 16h.01"></path>
+
+        </svg>
+
+      </div>
+
+      <h3>
+        Something went wrong
+      </h3>
+
+      <p>
+        {{ error }}
+      </p>
+
+      <button
+        type="button"
+        class="retry-button"
+        (click)="retry()"
+      >
+        Try again
+      </button>
+
+    </div>
+
+  }
+
+
+  <!-- ========================= -->
+  <!-- Main Content -->
+  <!-- ========================= -->
+
+  @if (!loading && !error) {
+
+    <!-- ========================= -->
+    <!-- Mini Stats -->
+    <!-- ========================= -->
+
+    <div class="mini-stats">
+
+      <div class="mini-stat">
+
+        <span class="mini-label">
+          Total
+        </span>
+
+        <strong>
+          {{ totalRequests }}
+        </strong>
+
+      </div>
+
+
+      <div class="mini-stat">
+
+        <span class="mini-label">
+          Open
+        </span>
+
+        <strong class="orange">
+          {{ openRequests }}
+        </strong>
+
+      </div>
+
+
+      <div class="mini-stat">
+
+        <span class="mini-label">
+          In Progress
+        </span>
+
+        <strong class="blue">
+          {{ inProgressRequests }}
+        </strong>
+
+      </div>
+
+
+      <div class="mini-stat">
+
+        <span class="mini-label">
+          Resolved
+        </span>
+
+        <strong class="green">
+          {{ resolvedRequests }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- Filters -->
+    <!-- ========================= -->
+
+    <div class="filters-card">
+
+      <!-- Search -->
+
+      <div class="search-wrapper">
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle
+            cx="11"
+            cy="11"
+            r="7"
+          />
+
+          <path
+            d="m20 20-4-4"
+          />
+
+        </svg>
+
+
+        <input
+          type="text"
+          placeholder="Search requests..."
+          [(ngModel)]="searchTerm"
+        />
+
+      </div>
+
+
+      <!-- Status -->
+
+      <div class="filter-group">
+
+        <label>
+          Status
+        </label>
+
+        <select
+          [(ngModel)]="selectedStatus"
+        >
+
+          <option value="all">
+            All statuses
+          </option>
+
+          <option value="open">
+            Open
+          </option>
+
+          <option value="in-progress">
+            In Progress
+          </option>
+
+          <option value="resolved">
+            Resolved
+          </option>
+
+          <option value="closed">
+            Closed
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- Priority -->
+
+      <div class="filter-group">
+
+        <label>
+          Priority
+        </label>
+
+        <select
+          [(ngModel)]="selectedPriority"
+        >
+
+          <option value="all">
+            All priorities
+          </option>
+
+          <option value="low">
+            Low
+          </option>
+
+          <option value="medium">
+            Medium
+          </option>
+
+          <option value="high">
+            High
+          </option>
+
+          <option value="urgent">
+            Urgent
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- Clear -->
+
+      <button
+        type="button"
+        class="clear-button"
+        (click)="clearFilters()"
+      >
+        Clear
+      </button>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- Requests Card -->
+    <!-- ========================= -->
+
+    <div class="requests-card">
+
+      <!-- Table Header -->
+
+      <div class="table-header">
+
+        <div>
+
+          <h2>
+            All Requests
+          </h2>
+
+          <span>
+            {{ filteredRequests.length }}
+            results
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- Table -->
+      <!-- ========================= -->
+
+      @if (filteredRequests.length > 0) {
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Request
+                </th>
+
+                <th>
+                  Category
+                </th>
+
+                <th>
+                  Priority
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Created
+                </th>
+
+                <th></th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              @for (
+                request of filteredRequests;
+                track request.id
+              ) {
+
+                <tr>
+
+                  <!-- Request -->
+
+                  <td>
+
+                    <div class="request-info">
+
+                      <div class="request-avatar">
+                        {{ request.title.charAt(0) }}
+                      </div>
+
+                      <div>
+
+                        <strong>
+                          {{ request.title }}
+                        </strong>
+
+                        <span>
+                          {{ request.id }}
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                  </td>
+
+
+                  <!-- Category -->
+
+                  <td>
+
+                    <span class="category">
+                      {{ request.category }}
+                    </span>
+
+                  </td>
+
+
+                  <!-- Priority -->
+
+                  <td>
+
+                    <span
+                      class="badge priority"
+                      [class.low]="request.priority === 'low'"
+                      [class.medium]="request.priority === 'medium'"
+                      [class.high]="request.priority === 'high'"
+                      [class.urgent]="request.priority === 'urgent'"
+                    >
+
+                      {{ getPriorityLabel(request.priority) }}
+
+                    </span>
+
+                  </td>
+
+
+                  <!-- Status -->
+
+                  <td>
+
+                    <span
+                      class="badge status"
+                      [class.open]="request.status === 'open'"
+                      [class.in-progress]="request.status === 'in-progress'"
+                      [class.resolved]="request.status === 'resolved'"
+                      [class.closed]="request.status === 'closed'"
+                    >
+
+                      <span class="status-dot"></span>
+
+                      {{ getStatusLabel(request.status) }}
+
+                    </span>
+
+                  </td>
+
+
+                  <!-- Date -->
+
+                  <td>
+
+                    <span class="date">
+                      {{ formatDate(request.createdAt) }}
+                    </span>
+
+                  </td>
+
+
+                  <!-- Action -->
+
+                  <td>
+
+                    <a
+                      [routerLink]="[
+                        '/requests',
+                        request.id
+                      ]"
+                      class="arrow-button"
+                      aria-label="View request details"
+                    >
+
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+
+                        <path
+                          d="M5 12h14"
+                        />
+
+                        <path
+                          d="m12 5 7 7-7 7"
+                        />
+
+                      </svg>
+
+                    </a>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      }
+
+
+      <!-- ========================= -->
+      <!-- Empty State -->
+      <!-- ========================= -->
+
+      @if (filteredRequests.length === 0) {
+
+        <div class="empty-state">
+
+          <div class="empty-icon">
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+            >
+
+              <circle
+                cx="11"
+                cy="11"
+                r="7"
+              />
+
+              <path
+                d="m20 20-4-4"
+              />
+
+            </svg>
+
+          </div>
+
+
+          <h3>
+            No requests found
+          </h3>
+
+
+          <p>
+            Try changing your search or filters.
+          </p>
+
+
+          <button
+            type="button"
+            (click)="clearFilters()"
+          >
+            Clear filters
+          </button>
+
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+</section>

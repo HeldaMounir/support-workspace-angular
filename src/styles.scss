@@ -1,0 +1,87 @@
+html,
+body {
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+}
+
+* {
+  font-family: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+body {
+  margin: 0;
+
+  font-family:
+    'DM Sans',
+    sans-serif;
+
+  background: #fafafa;
+  color: #171717;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+body.dark-theme {
+  background: #111111;
+  color: #ffffff;
+}
+
+body.dark-theme .navbar {
+  background: rgba(20, 20, 20, 0.92);
+  border-color: #292929;
+}
+
+body.dark-theme .page-info h1 {
+  color: #ffffff;
+}
+
+body.dark-theme .sidebar {
+  background: #151515;
+  border-color: #292929;
+}
+
+body.dark-theme .logo-title {
+  color: #ffffff;
+}
+
+body.dark-theme .nav-item {
+  color: #aaa;
+}
+
+body.dark-theme .nav-item:hover,
+body.dark-theme .nav-item.active {
+  background: #241a35;
+  color: #b388ff;
+}
+
+body.dark-theme .sidebar-bottom {
+  border-color: #292929;
+}
+
+body.dark-theme .main-content {
+  background: #111111;
+}
+
+body.dark-theme .icon-btn,
+body.dark-theme .theme-btn {
+  background: #1c1c1c;
+  border-color: #303030;
+  color: #aaa;
+}
+
+body.dark-theme .user-profile:hover {
+  background: #202020;
+}
+
+body.dark-theme .user-name {
+  color: #fff;
+}

@@ -1,0 +1,435 @@
+<div class="dashboard-page">
+
+  <!-- Header -->
+  <header class="dashboard-header">
+
+    <div class="header-content">
+
+      <span class="dashboard-eyebrow">
+        SUPPORT WORKSPACE
+      </span>
+
+      <h1>
+        Support overview
+      </h1>
+
+      <p>
+        Monitor requests, priorities, and support activity.
+      </p>
+
+    </div>
+
+    <a
+      routerLink="/requests"
+      class="view-requests-button"
+    >
+      View all requests
+    </a>
+
+  </header>
+
+
+  <!-- Loading -->
+  @if (loading) {
+
+    <div class="dashboard-state loading-state">
+
+      <div class="loader"></div>
+
+      <p>
+        Loading support requests...
+      </p>
+
+    </div>
+
+  }
+
+
+  <!-- Error -->
+  @if (!loading && error) {
+
+    <div class="dashboard-state error-state">
+
+      <div>
+        <strong>
+          Something went wrong
+        </strong>
+
+        <p>
+          {{ error }}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="loadRequests()"
+      >
+        Try again
+      </button>
+
+    </div>
+
+  }
+
+
+  @if (!loading && !error) {
+
+    <!-- Stats -->
+    <section class="stats-grid">
+
+      @for (stat of stats; track stat.label) {
+
+        <article
+          class="stat-card"
+          [class.stat-purple]="stat.tone === 'purple'"
+          [class.stat-orange]="stat.tone === 'orange'"
+          [class.stat-blue]="stat.tone === 'blue'"
+          [class.stat-green]="stat.tone === 'green'"
+        >
+
+          <div class="stat-top">
+
+            <span class="stat-label">
+              {{ stat.label }}
+            </span>
+
+            <span class="stat-icon">
+              @switch (stat.tone) {
+
+                @case ('purple') {
+                  <span>◉</span>
+                }
+
+                @case ('orange') {
+                  <span>!</span>
+                }
+
+                @case ('blue') {
+                  <span>◷</span>
+                }
+
+                @case ('green') {
+                  <span>✓</span>
+                }
+
+              }
+            </span>
+
+          </div>
+
+          <strong class="stat-value">
+            {{ stat.value }}
+          </strong>
+
+          <span class="stat-change">
+            {{ stat.change }}
+          </span>
+
+        </article>
+
+      }
+
+    </section>
+
+
+    <!-- Main Content -->
+    <div class="dashboard-grid">
+
+
+      <!-- Recent Requests -->
+      <section class="requests-section">
+
+        <div class="section-header">
+
+          <div>
+
+            <span class="section-eyebrow">
+              ACTIVITY
+            </span>
+
+            <h2>
+              Recent requests
+            </h2>
+
+            <p>
+              Latest support requests across the workspace.
+            </p>
+
+          </div>
+
+          <a
+            routerLink="/requests"
+            class="section-action"
+          >
+            View all
+            <span>↗</span>
+          </a>
+
+        </div>
+
+
+        <div class="requests-list">
+
+          @if (recentRequests.length > 0) {
+
+            @for (
+              request of recentRequests;
+              track request.id
+            ) {
+
+              <a
+                class="request-row"
+                [routerLink]="[
+                  '/requests',
+                  request.id
+                ]"
+              >
+
+                <div class="request-main">
+
+                  <div class="request-reference">
+                    {{ request.id }}
+                  </div>
+
+                  <div class="request-details">
+
+                    <strong>
+                      {{ request.title }}
+                    </strong>
+
+                    <span>
+                      {{ request.category }}
+                      ·
+                      {{ getRequestTime(request) }}
+                    </span>
+
+                  </div>
+
+                </div>
+
+
+                <div class="request-meta">
+
+                  <span
+                    class="priority-badge"
+                    [class.priority-low]="
+                      request.priority === 'low'
+                    "
+                    [class.priority-medium]="
+                      request.priority === 'medium'
+                    "
+                    [class.priority-high]="
+                      request.priority === 'high'
+                    "
+                    [class.priority-urgent]="
+                      request.priority === 'urgent'
+                    "
+                  >
+                    {{ getPriorityLabel(request.priority) }}
+                  </span>
+
+
+                  <span
+                    class="status-badge"
+                    [class.status-open]="
+                      request.status === 'open'
+                    "
+                    [class.status-progress]="
+                      request.status === 'in-progress'
+                    "
+                    [class.status-resolved]="
+                      request.status === 'resolved'
+                    "
+                    [class.status-closed]="
+                      request.status === 'closed'
+                    "
+                  >
+                    {{ getStatusLabel(request.status) }}
+                  </span>
+
+                </div>
+
+              </a>
+
+            }
+
+          } @else {
+
+            <div class="empty-state">
+
+              <div class="empty-icon">
+                ✓
+              </div>
+
+              <h3>
+                No requests yet
+              </h3>
+
+              <p>
+                There are currently no support requests.
+              </p>
+
+            </div>
+
+          }
+
+        </div>
+
+      </section>
+
+
+      <!-- Right Side -->
+      <aside class="dashboard-side">
+
+
+        <!-- Attention Card -->
+        <section class="attention-card">
+
+          <div class="attention-icon">
+            !
+          </div>
+
+          <div>
+
+            <span class="section-eyebrow">
+              NEEDS ATTENTION
+            </span>
+
+            <h3>
+              Requests waiting for support
+            </h3>
+
+            <p>
+              Review open and urgent requests that
+              may need action.
+            </p>
+
+          </div>
+
+          <a
+            routerLink="/requests"
+            class="attention-action"
+          >
+            Review requests
+            <span>↗</span>
+          </a>
+
+        </section>
+
+
+        <!-- Summary -->
+        <section class="summary-card">
+
+          <div class="section-header compact">
+
+            <div>
+
+              <span class="section-eyebrow">
+                WORKLOAD
+              </span>
+
+              <h2>
+                Request summary
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div class="summary-list">
+
+            <div class="summary-item">
+
+              <div class="summary-label">
+
+                <span class="summary-dot open"></span>
+
+                <span>
+                  Open
+                </span>
+
+              </div>
+
+              <strong>
+                {{ requests.filter(
+                  r => r.status === 'open'
+                ).length }}
+              </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+              <div class="summary-label">
+
+                <span class="summary-dot progress"></span>
+
+                <span>
+                  In progress
+                </span>
+
+              </div>
+
+              <strong>
+                {{ requests.filter(
+                  r => r.status === 'in-progress'
+                ).length }}
+              </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+              <div class="summary-label">
+
+                <span class="summary-dot resolved"></span>
+
+                <span>
+                  Resolved
+                </span>
+
+              </div>
+
+              <strong>
+                {{ requests.filter(
+                  r => r.status === 'resolved'
+                ).length }}
+              </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+              <div class="summary-label">
+
+                <span class="summary-dot closed"></span>
+
+                <span>
+                  Closed
+                </span>
+
+              </div>
+
+              <strong>
+                {{ requests.filter(
+                  r => r.status === 'closed'
+                ).length }}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </aside>
+
+    </div>
+
+  }
+
+</div>
